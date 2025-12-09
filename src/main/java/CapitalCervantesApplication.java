@@ -1,10 +1,11 @@
-package domain;
-
 import domain.RegraDeNegocioException;
 import domain.cliente.DadosCadastroCliente;
+import domain.conta.Conta;
+import domain.conta.ContaDAO;
 import domain.conta.ContaService;
 import domain.conta.DadosAberturaConta;
 
+import java.security.Provider;
 import java.util.Scanner;
 
 public class CapitalCervantesApplication {
@@ -49,7 +50,7 @@ public class CapitalCervantesApplication {
 
     private static int exibirMenu() {
         System.out.println("""
-                BYTEBANK - ESCOLHA UMA OPÇÃO:
+                CAPITAL CERVANTES - ESCOLHA UMA OPÇÃO:
                 1 - Listar contas abertas
                 2 - Abertura de conta
                 3 - Encerramento de conta
@@ -62,9 +63,29 @@ public class CapitalCervantesApplication {
     }
 
     private static void listarContas() {
-        System.out.println("Contas cadastradas:");
-        var contas = service.listarContasAbertas();
-        contas.stream().forEach(System.out::println);
+        int opcao;
+
+        do {
+            System.out.println("1 - Filtrar por número da conta\n" +
+                        "2 - Listar todas as contas cadastradas");
+            opcao = teclado.nextInt();
+
+        } while (opcao > 2);
+
+        switch (opcao) {
+            case 1:
+                System.out.println("Qual conta você deseja buscar?");
+                int numeroConta = teclado.nextInt();
+                var contasFiltradasNumero = service.listarContasAbertasPorNumero(numeroConta);
+                System.out.println(contasFiltradasNumero);
+
+                break;
+            case 2:
+                System.out.println("Contas cadastradas:");
+                var contas = service.listarContasAbertas();
+                contas.stream().forEach(System.out::println);
+                break;
+        }
 
         System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu principal");
         teclado.next();

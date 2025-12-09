@@ -1,18 +1,31 @@
 package domain.conta;
 
+import domain.ConnectionFactory;
 import domain.RegraDeNegocioException;
-import domain.cliente.Cliente;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ContaService {
 
+    private ConnectionFactory connection;
+
+    public ContaService() {
+        this.connection = new ConnectionFactory();
+    }
+
     private Set<Conta> contas = new HashSet<>();
 
     public Set<Conta> listarContasAbertas() {
-        return contas;
+        Connection conn = connection.recuperarConexao();
+        return new ContaDAO(conn).listar();
+    }
+
+    public Conta listarContasAbertasPorNumero(int numeroConta) {
+        Connection conn = connection.recuperarConexao();
+        return new ContaDAO(conn).listarNumero(numeroConta);
     }
 
     public BigDecimal consultarSaldo(Integer numeroDaConta) {
@@ -21,13 +34,8 @@ public class ContaService {
     }
 
     public void abrir(DadosAberturaConta dadosDaConta) {
-        var cliente = new Cliente(dadosDaConta.dadosCliente());
-        var conta = new Conta(dadosDaConta.numero(), cliente);
-        if (contas.contains(conta)) {
-            throw new RegraDeNegocioException("Já existe outra conta aberta com o mesmo número!");
-        }
-
-        contas.add(conta);
+        Connection conn = connection.recuperarConexao();
+        new ContaDAO(conn).salvar(dadosDaConta);
     }
 
     public void realizarSaque(Integer numeroDaConta, BigDecimal valor) {
