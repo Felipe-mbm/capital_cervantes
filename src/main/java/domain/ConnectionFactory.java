@@ -1,15 +1,27 @@
 package domain;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionFactory {
     public Connection recuperarConexao() {
         try {
-            return DriverManager.getConnection("jdbc:mysql://localhost:3306/capital_cervantes?user=root&password=Lh!c5T*Z8GYVMT");
+            return createDataSource().getConnection();
         } catch (SQLException e ) {
             throw new RuntimeException("Erro de conexão:" + e);
         }
+    }
+
+    private HikariDataSource createDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/capital_cervantes");
+        config.setUsername("root");
+        config.setPassword("Lh!c5T*Z8GYVMT");
+        config.setMaximumPoolSize(10);
+
+        return new HikariDataSource(config);
     }
 }
